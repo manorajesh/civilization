@@ -1,4 +1,4 @@
-use noise::{ NoiseFn, Perlin, Seedable };
+use noise::{ NoiseFn, Perlin };
 use rand::Rng;
 
 // -----------------------------
@@ -57,7 +57,7 @@ trait FromNoise {
 
 impl FromNoise for ResourceType {
     fn from_noise(noise: f64) -> Self {
-        if noise < 0.2 {
+        if noise < 0.01 {
             ResourceType::Water
         } else if noise < 0.35 {
             ResourceType::Field
