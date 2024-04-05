@@ -25,12 +25,10 @@ fn setup(
         ..Default::default()
     });
 
-    let cell_size = Vec3::new(1.0, 0.5, 1.0); // Width, Height, Depth
-
     for row in map.cells.iter() {
         for cell in row.iter() {
             // Calculate position in 3D space
-            let position = Vec3::new(cell.x as f32, 0.0, cell.y as f32) * cell_size.x;
+            let position = Vec3::new(cell.x as f32, 0.0, cell.y as f32);
 
             let color = match cell.cell_types[0] {
                 CellType::Empty => Color::BLACK,
@@ -39,6 +37,15 @@ fn setup(
                 CellType::Resource(ResourceType::Tree) => Color::GREEN,
                 CellType::Resource(ResourceType::Stone) => Color::GRAY,
                 _ => Color::WHITE,
+            };
+
+            let cell_size = match cell.cell_types[0] {
+                CellType::Empty => Vec3::new(1.0, 0.1, 1.0),
+                CellType::Resource(ResourceType::Water) => Vec3::new(1.0, 0.1, 1.0),
+                CellType::Resource(ResourceType::Field) => Vec3::new(1.0, 0.5, 1.0),
+                CellType::Resource(ResourceType::Tree) => Vec3::new(0.5, 1.0, 0.5),
+                CellType::Resource(ResourceType::Stone) => Vec3::new(1.0, 1.0, 1.0),
+                _ => Vec3::new(1.0, 1.0, 1.0),
             };
 
             commands.spawn(PbrBundle {
