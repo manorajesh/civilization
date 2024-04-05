@@ -5,44 +5,13 @@ use bevy::input::mouse::MouseWheel;
 use bevy::pbr::CascadeShadowConfigBuilder;
 use bevy::prelude::*;
 use bevy::render::mesh::PrimitiveTopology;
+use map::{ CellType, Map, ResourceType };
 
-enum CellType {
-    Empty,
-    Player,
-    Enemy,
-    Resource,
-}
-
-struct MapCell {
-    cell_type: CellType,
-    x: i32,
-    y: i32,
-}
-
-#[derive(Resource)]
-struct GameMap(Vec<Vec<MapCell>>);
-
-impl GameMap {
-    fn new(height: i32, width: i32) -> Self {
-        let mut map = Vec::new();
-        for y in 0..height {
-            let mut row = Vec::new();
-            for x in 0..width {
-                row.push(MapCell {
-                    cell_type: CellType::Empty,
-                    x,
-                    y,
-                });
-            }
-            map.push(row);
-        }
-        Self(map)
-    }
-}
+mod map;
 
 fn setup(
     mut commands: Commands,
-    map: Res<GameMap>,
+    map: Res<Map>,
     mut materials: ResMut<Assets<StandardMaterial>>,
     mut meshes: ResMut<Assets<Mesh>>
 ) {
@@ -58,16 +27,18 @@ fn setup(
 
     let cell_size = Vec3::new(1.0, 0.5, 1.0); // Width, Height, Depth
 
-    for row in map.0.iter() {
+    for row in map.cells.iter() {
         for cell in row.iter() {
             // Calculate position in 3D space
             let position = Vec3::new(cell.x as f32, 0.0, cell.y as f32) * cell_size.x;
 
-            let color = match cell.cell_type {
-                CellType::Empty => Color::GREEN,
-                CellType::Player => Color::BLUE,
-                CellType::Enemy => Color::RED,
-                CellType::Resource => Color::YELLOW,
+            let color = match cell.cell_types[0] {
+                CellType::Empty => Color::BLACK,
+                CellType::Resource(ResourceType::Water) => Color::BLUE,
+                CellType::Resource(ResourceType::Field) => Color::GREEN,
+                CellType::Resource(ResourceType::Tree) => Color::GREEN,
+                CellType::Resource(ResourceType::Stone) => Color::GRAY,
+                _ => Color::WHITE,
             };
 
             commands.spawn(PbrBundle {
@@ -137,7 +108,7 @@ fn move_camera(
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
-        .insert_resource(GameMap::new(10, 10))
+        .insert_resource(Map::new(100, 100, None))
         .add_systems(Startup, setup)
         .add_systems(Update, move_camera)
         .run();
