@@ -1,4 +1,3 @@
-use bevy::ecs::system::Resource;
 use noise::{ NoiseFn, Perlin };
 use rand::Rng;
 
@@ -41,7 +40,7 @@ pub struct MapCell {
     pub cell_types: Vec<CellType>,
 }
 
-#[derive(Debug, Resource)]
+#[derive(Debug)]
 pub struct Map {
     pub width: usize,
     pub height: usize,
